@@ -3,6 +3,46 @@ function norm_taylor_diag(mat, ref, varargin)
     % number of time series
     nts = length(ref);
     
+    
+    % ------------- %
+    % create figure %
+    % ------------- %
+    
+    figure
+    hold on
+    axis equal
+    ax = gca;
+    ax.LineWidth = 1;
+    ax.FontSize = 14;
+    
+    
+    % ------------- %
+    % read varargin %
+    % ------------- %
+    
+    % default values
+    for i = 1:nts
+        marker{i} = 'o';
+        marker_edge_color{i} = 'k';
+        marker_face_colot{i} = ax.ColorOrder(2, :);
+        marker_size{i} = 6;
+    end
+    
+    if nargin > 2
+        for i = 1:2:nargin - 2
+            if strcmp(varargin{i}, 'Marker')
+                marker = varargin{i + 1};
+            elseif strcmp(varargin{i}, 'MarkerEdgeColor')
+                marker_edge_color = varargin{i + 1};
+            elseif strcmp(varargin{i}, 'MarkerFaceColor')
+                marker_face_color = varargin{i + 1};
+            elseif strcmp(varargin{i}, 'MarkerSize')
+                marker_size = varargin{i + 1};
+            end
+        end
+    end
+    
+    
     % ------------------ %
     % compute statistics %
     % ------------------ %
@@ -75,18 +115,6 @@ function norm_taylor_diag(mat, ref, varargin)
         stat(6, i) = R;
         
     end
-    
-    
-    % ------------- %
-    % create figure %
-    % ------------- %
-    
-    figure
-    hold on
-    axis equal
-    ax = gca;
-    ax.LineWidth = 1;
-    ax.FontSize = 14;
     
     
     % ------------------ %
@@ -205,9 +233,11 @@ function norm_taylor_diag(mat, ref, varargin)
     
     % reference point
     h = plot(1, 0);
-    h.Color = 'k';
-    h.Marker = '.';
-    h.MarkerSize = 30;
+    h.Marker = 'o';
+    h.MarkerEdgeColor = 'k';
+    h.MarkerFaceColor = 'k';
+    h.MarkerSize = 8;
+    h.LineStyle = 'none';
     
     % other points
     r = stat(5, :) ./ stat(5, ref);
@@ -218,9 +248,11 @@ function norm_taylor_diag(mat, ref, varargin)
     for i = 1:nts
         if sum(i == ref) == 0
             h = plot(x(i), y(i));
-            h.Color = ax.ColorOrder(2, :);
-            h.Marker = '.';
-            h.MarkerSize = 20;
+            h.Marker = marker{i};
+            h.MarkerEdgeColor = marker_edge_color{i};
+            h.MarkerFaceColor = marker_face_color{i};
+            h.MarkerSize = marker_size{i};
+            h.LineStyle = 'none';
         end
     end
     
