@@ -24,7 +24,7 @@ function norm_taylor_diag(mat, ref, varargin)
     for i = 1:nts
         marker{i} = 'o';
         marker_edge_color{i} = 'k';
-        marker_face_colot{i} = ax.ColorOrder(2, :);
+        marker_face_color{i} = ax.ColorOrder(2, :);
         marker_size{i} = 6;
     end
     
