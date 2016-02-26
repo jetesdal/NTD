@@ -33,8 +33,8 @@ for i = 11:8:80; marker_face_color{i} = color_order(3, :); end
 for i = 12:8:80; marker_face_color{i} = color_order(4, :); end
 for i = 13:8:80; marker_face_color{i} = color_order(5, :); end
 for i = 14:8:80; marker_face_color{i} = color_order(6, :); end
-for i = 15:8:80; marker_face_color{i} = color_order(7, :); end
-for i = 16:8:80; marker_face_color{i} = [0 0 0]; end
+for i = 15:8:80; marker_face_color{i} = [0 0 0]; end
+for i = 16:8:80; marker_face_color{i} = color_order(7, :); end
 
 % draw normalized Taylor diagram
 norm_taylor_diag(mat, ref, 'Marker', marker, ...
