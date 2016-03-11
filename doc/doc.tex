@@ -1,11 +1,19 @@
 \documentclass{article}
 
+% use \text in equations
+\usepackage{amsmath}
+
+% authors with several affiliations
 \usepackage{authblk}
 \renewcommand\Affilfont{\normalsize}
-\usepackage{natbib}
-\usepackage{amsmath}
+
+% include PDF figures
 \usepackage{graphicx}
 
+% use bibtex with citet and citep
+\usepackage{natbib}
+
+% new commands
 \newcommand{\mbar}{\bar{m}}
 \newcommand{\obar}{\bar{o}}
 \newcommand{\sumin}{\sum_{i=1}^N}
@@ -13,14 +21,20 @@
 \newcommand{\rmse}{\text{RMSE}}
 \newcommand{\crmse}{\text{CRMSE}}
 
+% title information
 \title{Normalized Taylor diagrams}
 \author[1, 2]{Olivier Gourgue}
 \affil[1]{Vrije Universiteit Brussel, Department of Hydrology and Hydraulic Engineering, Pleinlaan 2, 1050 Brussels, Belgium}
 \affil[2]{Flanders Hydraulics Research, Flemish Government, Berchemlei 115, 2140 Antwerp, Belgium}
 
-\begin{document}
 
+%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%
 \maketitle
+%%%%%%%%%%
 
 A Taylor diagram is a polar coordinate plot that summarizes multiple aspects of model performance in a single diagram \citep{Taylor2001}. An even powerful normalized version \citep{Karna2016} is used in this project. This section describes the theoretical aspects behind it.
 
@@ -72,7 +86,11 @@ With Taylor diagrams, one (as in Figure \ref{fig_taylor}) or several model runs 
   \label{fig_norm_taylor}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{doc}
 \bibliographystyle{apalike}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%
 \end{document}
+%%%%%%%%%%%%%%
