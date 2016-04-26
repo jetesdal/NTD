@@ -1,8 +1,21 @@
-function norm_taylor_diag(mat, ref, varargin)
+function norm_taylor_diag(ts, varargin)
 
-    % number of time series
-    nts = length(ref);
-    
+    % old
+    % ---
+    % mat: matrix containing time series (TS)
+    % ref: vector containing the ID of the reference TS
+    %      mat(:, ref(i)) is the reference TS of mat(:, i)
+    %      ref(i) = i for reference TS
+    % problem: all reference TS must be the same size, while sometimes
+    %          measuremnts do not have the same time step
+    %
+    % new
+    % ---
+    % ts{k}: matrix containing the reference TS (1st column) and the TS to
+    %        compare with (other columns)
+    %
+    % varargin: properties for figures
+
     
     % ------------- %
     % create figure %
@@ -16,104 +29,82 @@ function norm_taylor_diag(mat, ref, varargin)
     ax.FontSize = 14;
     
     
-    % ------------- %
-    % read varargin %
-    % ------------- %
-    
-    % default values
-    for i = 1:nts
-        marker{i} = 'o';
-        marker_edge_color{i} = 'k';
-        marker_face_color{i} = ax.ColorOrder(2, :);
-        marker_size{i} = 6;
-    end
-    
-    if nargin > 2
-        for i = 1:2:nargin - 2
-            if strcmp(varargin{i}, 'Marker')
-                marker = varargin{i + 1};
-            elseif strcmp(varargin{i}, 'MarkerEdgeColor')
-                marker_edge_color = varargin{i + 1};
-            elseif strcmp(varargin{i}, 'MarkerFaceColor')
-                marker_face_color = varargin{i + 1};
-            elseif strcmp(varargin{i}, 'MarkerSize')
-                marker_size = varargin{i + 1};
-            end
-        end
-    end
-    
-    
     % ------------------ %
     % compute statistics %
     % ------------------ %
-    
-    % stat is a matrix gathering all the statistics about time series
+
+    % stat{k} is a matrix gathering all the statistics about time series
     % row #1: mean
     % row #2: bias
     % row #3: root mean square error
     % row #4: centered root mean square error
     % row #5: standard deviation
     % row #6: correlation coefficien
-    stat = zeros(6, nts);
-
-    % reference time series IDs
-    ref_id = [];
-    for i = 1:nts
-        if ref(i) == i
-            ref_id = [ref_id i];
+    
+    
+    % for each reference time series
+    for k = 1:length(ts)
+        
+        % number of time series
+        nts{k} = size(ts{k}, 2);
+        
+        if nts{k} > 8
+            error(['defalut marker_face_color limited to 8 time ' ...
+                   'series, including the reference time series']);
         end
-    end
-    
-    % indices of "not NaN" data in each time series
-    ind = cell(1, nts);
-    for i = 1:nts
-        ind{i} = find(~isnan(mat(:, i)));
-    end
-    
-    % for each time series
-    for i = 1:nts
         
-        % time series
-        X = mat(ind{ref(i)}, i);
+        % initialize stat{k} matrix
+        stat{k} = zeros(6, nts{k});
         
-        % reference time series
-        Xref = mat(ind{ref(i)}, ref(i));
+        % indices of "not NaN" data in each time series
+        ind = find(~isnan(ts{k}(:, 1)));
         
-        % number of data
-        N = length(X);
-        
-        % mean
-        S = mean(X);
-        
-        % mean of the reference time series
-        Sref = mean(Xref);
-        
-        % bias
-        bias = S - Sref;
-        
-        % root mean square error
-        RMSE = sqrt(sum((X - Xref) .^ 2) / N);
-        
-        % centered root mean square error
-        CRMSE = sqrt(sum(((X - S) - (Xref - Sref)) .^ 2) / N);
-        
-        % standard deviation
-        sigma = sqrt(sum((X - S) .^ 2) / N);
-        
-        % standard deviation of the reference
-        sigmaref = sqrt(sum((Xref - Sref) .^ 2) / N);
+        % for each time series
+        for j = 1:nts{k}
 
-        % correlation coefficient
-        R = sum((X - S) .* (Xref - Sref)) / (N * sigma * sigmaref);
-        
-        % statistic matric
-        stat(1, i) = S;
-        stat(2, i) = bias;
-        stat(3, i) = RMSE;
-        stat(4, i) = CRMSE;
-        stat(5, i) = sigma;
-        stat(6, i) = R;
-        
+            % time series
+            X = ts{k}(ind, j);
+            
+            % reference time series
+            Xref = ts{k}(ind, 1);
+
+            % number of data
+            N = size(X, 1);
+
+            % mean
+            S = mean(X);
+            
+            % reference mean
+            Sref = mean(Xref);
+
+            % bias
+            bias = S - Sref;
+
+            % root mean square error
+            RMSE = sqrt(sum((X - Xref) .^ 2) / N);
+
+            % centered root mean square error
+            CRMSE = sqrt(sum(((X - S) - (Xref - Sref)) .^ 2) / N);
+
+            % standard deviation
+            sigma = sqrt(sum((X - S) .^ 2) / N);
+
+            % standard deviation of the reference
+            sigmaref = sqrt(sum((Xref - Sref) .^ 2) / N);
+
+            % correlation coefficient
+            R = sum((X - S) .* (Xref - Sref)) / (N * sigma * sigmaref);
+
+            % statistic matric
+            stat{k}(1, j) = S;
+            stat{k}(2, j) = bias;
+            stat{k}(3, j) = RMSE;
+            stat{k}(4, j) = CRMSE;
+            stat{k}(5, j) = sigma;
+            stat{k}(6, j) = R;
+
+        end
+                
     end
     
     
@@ -121,11 +112,14 @@ function norm_taylor_diag(mat, ref, varargin)
     % standard deviation %
     % ------------------ %
     
-    % normalize standard deviation
-    sigma = stat(5, :) ./ stat(5, ref);
-    
-    % maximum standard deviation
-    sigmamax = max(sigma);
+    % maximum standard deviation to plot
+    sigmamax = 0;
+    for k = 1:length(ts)
+        sigma = stat{k}(5, :) ./ stat{k}(5, 1); % normalized std
+        if max(sigma) > sigmamax
+            sigmamax = max(sigma);
+        end
+    end    
     
     % standard deviation limit on diagram
     sigmalim = max(1.25, ceil(sigmamax * 4) / 4);
@@ -227,6 +221,18 @@ function norm_taylor_diag(mat, ref, varargin)
     h.Rotation = -45;
     
     
+    % ------------- %
+    % read varargin %
+    % ------------- %
+    
+    % default values
+    marker = 'osd^v><ph+*.x';
+    marker_edge_color = ax.ColorOrder;
+    marker_face_color = ax.ColorOrder;
+   
+    % implement something for when using non default values
+    
+    
     % --------- %
     % plot data %
     % --------- %
@@ -239,21 +245,21 @@ function norm_taylor_diag(mat, ref, varargin)
     h.MarkerSize = 8;
     h.LineStyle = 'none';
     
+    size(marker_face_color)
+    
     % other points
-    r = stat(5, :) ./ stat(5, ref);
-    theta = acos(min(1, stat(6, :)));
-    x = r .* cos(theta);
-    y = r .* sin(theta);
-    
-    for i = 1:nts
-        if sum(i == ref) == 0
-            h = plot(x(i), y(i));
-            h.Marker = marker{i};
-            h.MarkerEdgeColor = marker_edge_color{i};
-            h.MarkerFaceColor = marker_face_color{i};
-            h.MarkerSize = marker_size{i};
-            h.LineStyle = 'none';
-        end
+    for k = 1:length(ts)
+        r = stat{k}(5, :) ./ stat{k}(5, 1);
+        theta = acos(min(1, stat{k}(6, :)));
+        x = r .* cos(theta)
+        y = r .* sin(theta)
+
+        for j = 2:nts{k}
+            h = plot(x(j), y(j));
+            disp('yo')
+            h.Marker = marker(k);
+            h.MarkerEdgeColor = marker_edge_color(j - 1, :);
+            h.MarkerFaceColor = marker_face_color(j - 1, :);
+        end 
     end
-    
     
