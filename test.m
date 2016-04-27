@@ -10,12 +10,12 @@ close all
 load('test_1.mat');
 
 % default marker properties
-figure
+figure(2)
 ax = gca;
-marker = 'osd^v><ph+*.x';
+marker = 'osd^v><ph+*x';
 marker_edge_color = ax.ColorOrder;
 marker_face_color = ax.ColorOrder;
-close
+close(2)
 
 % draw normalized Taylor diagram
 norm_taylor_diag(ts);

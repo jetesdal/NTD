@@ -226,7 +226,7 @@ function norm_taylor_diag(ts, varargin)
     % ------------- %
     
     % default values
-    marker = 'osd^v><ph+*.x';
+    marker = 'osd^v><ph+*x';
     marker_edge_color = ax.ColorOrder;
     marker_face_color = ax.ColorOrder;
    
@@ -245,18 +245,15 @@ function norm_taylor_diag(ts, varargin)
     h.MarkerSize = 8;
     h.LineStyle = 'none';
     
-    size(marker_face_color)
-    
     % other points
     for k = 1:length(ts)
         r = stat{k}(5, :) ./ stat{k}(5, 1);
         theta = acos(min(1, stat{k}(6, :)));
-        x = r .* cos(theta)
-        y = r .* sin(theta)
+        x = r .* cos(theta);
+        y = r .* sin(theta);
 
         for j = 2:nts{k}
             h = plot(x(j), y(j));
-            disp('yo')
             h.Marker = marker(k);
             h.MarkerEdgeColor = marker_edge_color(j - 1, :);
             h.MarkerFaceColor = marker_face_color(j - 1, :);
